@@ -17,3 +17,4 @@
 # done
 
 - logging program <create_log_structure.jl> with init <init_logging()> returns string directory variable for logging appendix
+- testfile are accessed by <<DataFrame(CSV.File(path, header=1, delim=","))>>
