@@ -1,8 +1,6 @@
-# solid-fiesta
+# structure for the cluster: todo
 
-## structure for the cluster
-
-### 1 mode extraction
+## 1 mode extraction
 
 - fit the data into a shape that is most convenient for the extraction approaches
 - PCA in MultiVariateStats.jl uses general matrix input
@@ -12,6 +10,10 @@
 - question of window length: lets make a trial with the PCA, then check the SSA
 	
 
-### 2 differentiating properties
+## 2 differentiating properties
 
-### 3 coupling model
+## 3 coupling model
+
+# done
+
+- logging program <create_log_structure.jl> with init <init_logging()> returns string directory variable for logging appendix
