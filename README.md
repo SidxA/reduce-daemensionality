@@ -1,4 +1,22 @@
-# structure for the cluster: todo
+# plan
+
+the point is to localize information
+for that we need to split the time series into intervals
+interval selection might be based on brute split, driving period, merging after splitting, 
+
+## ideas
+
+equal splitting lengthes might make the later comparison of local modes easier
+can we create a structural splitting, by the split and merge with shannon entropy?
+
+
+the localized multiscale ssa is able to detect a frequency shift aka devilsstaircase in the enso data
+
+there is the possibility of 'sifting' the signal to get rid of riding waves and to create local mean zero
+there is the possibility of smooth orthogonal projection (bell)
+there is the possibility of merging short intervals in order to avoid redundancy
+
+# computation structure
 
 ## 1 mode extraction
 
