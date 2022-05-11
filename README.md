@@ -1,14 +1,22 @@
 # plan
 
-- the point is to localize information
-- for that we need to split the time series into intervals
-- interval selection might be based on brute split, driving period, merging after splitting, 
+- build algorithmic structure to extract "phase" information from time series
+- setup of differentiating globally by SSA and DiffMap
+- assign phase information to the components by Hilbert Transformation
+
+# logs
+
+- global ssa has a problem with unsufficient boundary interpolation at large windows
+- there is still the problem of amplitude reconstruction
+
 
 ## ideas
 
 - equal splitting lengthes might make the later comparison of local modes easier
 - can we create a structural splitting, by the split and merge with shannon entropy?
-
+- the point is to localize information
+- for that we need to split the time series into intervals
+- interval selection might be based on brute split, driving period, merging after splitting, 
 
 - the localized multiscale ssa is able to detect a frequency shift aka devilsstaircase in the enso data
 
