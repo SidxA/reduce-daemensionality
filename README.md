@@ -1,13 +1,10 @@
-# plan
+# plan - should be done by late June if possible!
 
-- build algorithmic structure to extract "phase" information from time series
-- setup of differentiating globally by SSA and DiffMap
+- extract components from time series
+	- build algorithmic structure to extract "phase" information from time series
+	- setup of differentiating globally by SSA and DiffMap
 - assign phase information to the components by Hilbert Transformation
-
-# logs
-
-- global ssa has a problem with unsufficient boundary interpolation at large windows
-- there is still the problem of amplitude reconstruction
+- build Bifurcation models for data creation for testing
 
 
 ## ideas
@@ -40,7 +37,11 @@
 
 ## 3 coupling model
 
-# done
-
-- logging program <create_log_structure.jl> with init <init_logging()> returns string directory variable for logging appendix
-- testfile are accessed by <<DataFrame(CSV.File(path, header=1, delim=","))>>
+# logs
+- 05/10
+	- global ssa has a problem with unsufficient boundary interpolation at large windows
+	- there is still the problem of amplitude reconstruction
+- 05/11
+	- diffusion map works for $\epsilon>10$, best at $>200$
+	- manifoldlearning or fitfrom multivar stats has automatically 8 cores
+	- 
