@@ -51,4 +51,4 @@
 	- manifoldlearning or fitfrom multivar stats has automatically 8 cores
 - 05/15
 	- analyticsignal form FourierAnalysis is the hilbert trafo, cation due to extracted DC/mean? component
-	- 
+	- diffmap alpha parameter distinguishes between "directionalized" diffusion? 0.5 should be good
