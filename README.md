@@ -6,7 +6,7 @@
 - assign phase information to the components by Hilbert Transformation
 - build Bifurcation models for data creation for testing
 
--signal
+- signal
 	- (iterated) phases, T
 	- components
 		- T
