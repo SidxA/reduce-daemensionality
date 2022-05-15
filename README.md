@@ -6,6 +6,11 @@
 - assign phase information to the components by Hilbert Transformation
 - build Bifurcation models for data creation for testing
 
+-signal
+	- (iterated) phases, T
+	- components
+		- T
+		- phases, T
 
 ## ideas
 
@@ -44,4 +49,6 @@
 - 05/11
 	- diffusion map works for $\epsilon>10$, best at $>200$
 	- manifoldlearning or fitfrom multivar stats has automatically 8 cores
+- 05/15
+	- analyticsignal form FourierAnalysis is the hilbert trafo, cation due to extracted DC/mean? component
 	- 
