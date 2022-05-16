@@ -53,4 +53,6 @@
 	- analyticsignal form FourierAnalysis is the hilbert trafo, cation due to extracted DC/mean? component
 	- diffmap alpha parameter distinguishes between "directionalized" diffusion? 0.5 should be good
 	- diffmap fit only uses multiple cores when called by include from external script
+- 05/16
+	- normalization term is wrong in computational papers for the ssa
 	- 
