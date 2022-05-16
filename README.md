@@ -45,7 +45,6 @@
 # logs
 - 05/10
 	- global ssa has a problem with unsufficient boundary interpolation at large windows
-	- there is still the problem of amplitude reconstruction
 - 05/11
 	- diffusion map works for $\epsilon>10$, best at $>200$
 	- manifoldlearning or fitfrom multivar stats has automatically 8 cores
@@ -54,5 +53,5 @@
 	- diffmap alpha parameter distinguishes between "directionalized" diffusion? 0.5 should be good
 	- diffmap fit only uses multiple cores when called by include from external script
 - 05/16
-	- normalization term is wrong in computational papers for the ssa
-	- 
+	- normalization term is wrong in computational papers for the ssa,amplitudes work now
+	- parallel iteration and extraction routine are working
