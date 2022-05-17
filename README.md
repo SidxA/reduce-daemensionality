@@ -43,15 +43,25 @@
 ## 3 coupling model
 
 # logs
-- 05/10
-	- global ssa has a problem with unsufficient boundary interpolation at large windows
-- 05/11
-	- diffusion map works for $\epsilon>10$, best at $>200$
-	- manifoldlearning or fitfrom multivar stats has automatically 8 cores
-- 05/15
-	- analyticsignal form FourierAnalysis is the hilbert trafo, cation due to extracted DC/mean? component
-	- diffmap alpha parameter distinguishes between "directionalized" diffusion? 0.5 should be good
-	- diffmap fit only uses multiple cores when called by include from external script
-- 05/16
-	- normalization term is wrong in computational papers for the ssa,amplitudes work now
-	- parallel iteration and extraction routine are working
+05/10
+- global ssa has a problem with unsufficient boundary interpolation at large windows
+05/11
+- diffusion map works for $\epsilon>10$, best at $>200$
+- manifoldlearning or fitfrom multivar stats has automatically 8 cores
+05/15
+- analyticsignal form FourierAnalysis is the hilbert trafo, cation due to extracted DC/mean? component
+- diffmap alpha parameter distinguishes between "directionalized" diffusion? 0.5 should be good
+- diffmap fit only uses multiple cores when called by include from external script
+05/16
+- normalization term is wrong in computational papers for the ssa,amplitudes work now
+- parallel iteration and extraction routine are working
+05/17
+- local SSA is way more diffuse about the period lengths
+- maybe needs check up due to maxima/signchanges
+- maybe needs a better reformulation then the averaging
+- 2 directions: globally for coupling on different timescales
+- timescale extraction seems to be a bit better with diffmap, there is a parameter run to check
+- locally for phenomena in time such as bifurcations - this is somehow also the idrection of multiscale ssa or wavelet analysis
+- possibly locally diffmap is not that strong
+- local reconstruction is somehow broken
+- possibly, replicative localisation breaks diffmap, maybe needs different parameter!
