@@ -5,11 +5,12 @@ July
 August
 September
 
-Foremost:
-Development part:
-put Diffusion map on model scenarios:
-- logistic map puts period-2-orbit this might be a bit delicate to be honest
-- rather hopf bifurcation which is"just size of limit cycle" from equilibrium...
+Foremost;Development part:
+different scenarios of amplitude and frequency change
+start with the frequencies, test carrier-waves and multiple overlaps
+- build simple harmonic screech
+- build abrupt change the brute way
+- combinations of them
 
 extract 'local phase velocity' to detect phenomena
 
