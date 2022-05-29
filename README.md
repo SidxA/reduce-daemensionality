@@ -1,5 +1,24 @@
 # plan - should be done by late June if possible!
 
+June
+July
+August
+September
+
+Foremost:
+Development part:
+put Diffusion map on model scenarios:
+- logistic map puts period-2-orbit this might be a bit delicate to be honest
+- rather hopf bifurcation which is"just size of limit cycle" from equilibrium...
+
+extract 'local phase velocity' to detect phenomena
+
+investigate for
+- required time series length
+- rate of change
+- noise level
+
+
 - extract components from time series
 	- build algorithmic structure to extract "phase" information from time series
 	- setup of differentiating globally by SSA and DiffMap
