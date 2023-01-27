@@ -23,4 +23,9 @@
 - hilbert transform quaternizes individual modes to create instantanious phase in analytic signal representation: protophase
 - half protophase zero count gives period length to estimate mode frequency
 
-- showcase characteristics based on the variance and frequency of the individual modes
+-showcase characteristics based on the variance and frequency of the individual modes
+
+
+- blabla
+- bla
+
