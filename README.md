@@ -12,7 +12,7 @@
 
 - read measurement series of length **N**
 - center measurement series, with observation average and variance
-- perform delay embedding with fixed delay embedding parameter W to create data matrix
+- perform delay embedding with fixed delay embedding parameter **W** to create data matrix
 - centralize data matrix
 - chose number **k** of reduced dimension from **k<P, P = N - W +1**
 - SSA computes **k** (left) singular vectors of data matrix: modes
