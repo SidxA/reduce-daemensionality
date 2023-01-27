@@ -31,6 +31,15 @@
 - this decomposition is datadriven and orthogonal, which poses the question wether it can separate different timescales in time series
 - since modes are quasiperiodic individual timescales can be estimated by frequencies
 - dimensionality reduction suffers from artifacts linked to orthogonality: variance compression & degeneracy
+
+### questions
+
 - how do linear (SSA, keeps global metric) and nonlinear (NLSA,keeps local metric - diffusion distance) differ in attributing timescales?
 - how do these artifacts play out?
 - how does the embedding length parameter influence the attributed timescales?
+
+### awnsers
+
+- timeseries with consistent frequency and amplitude are getting identical attributed harmonics of the seasonal cycle. amplitude and frequency modulation: SSA identifies strong harmonic structure, NLSA creates more time-localized modes by frequency modulation
+- the strong seasonal trend in the signal is always the first identified mode and subsequent detections are constrained orthogonal to it, eg. harmonic
+- all oscillatory modes are confined to period lengths in multiples of the embedding length parameter - similar to boundary condition
