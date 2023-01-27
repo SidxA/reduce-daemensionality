@@ -41,5 +41,5 @@
 ### awnsers
 
 - timeseries with consistent frequency and amplitude are getting identical attributed harmonics of the seasonal cycle. amplitude and frequency modulation: SSA identifies strong harmonic structure, NLSA creates more time-localized modes by frequency modulation
-- the strong seasonal trend in the signal is always the first identified mode and subsequent detections are constrained orthogonal to it, eg. harmonic
+- the strong seasonal trend in the signal is always the first identified mode and subsequent detections are constrained orthogonal to it, eg. harmonic - **but**: additional information can be amplitude modulated on top of this 'carrier', frequency estimation not waterproof
 - all oscillatory modes are confined to period lengths in multiples of the embedding length parameter - similar to boundary condition
