@@ -1,7 +1,8 @@
 # logfile
 
 ## 01/28
-    created repository structure
+    created repository structure in cluster
+    added authentification
     added chatgpt functionality for commenting
 
     aims

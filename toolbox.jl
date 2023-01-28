@@ -2,7 +2,7 @@
 #activate the Pkg
 #----------------------------------------------------------------------
 using Pkg
-Pkg.activate("1_7_2_test")
+Pkg.activate("reduce_daemensionality_julia")
 #----------------------------------------------------------------------
 #time stamp for saving analysis results
 #----------------------------------------------------------------------
