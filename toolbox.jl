@@ -1,7 +1,10 @@
-#----------------------------------------------------------------------
-#activate the Pkg
-#----------------------------------------------------------------------
+
+"""
+environment
+"""
+
 using Pkg
+
 Pkg.activate("reduce_daemensionality_julia")
 #----------------------------------------------------------------------
 #time stamp for saving analysis results
@@ -18,6 +21,71 @@ function init_logging()
     return dir
 end
 dir = init_logging()
+
+
+"""
+read in modes
+"""
+
+function read_modes_single_file(method,W,vari,spot)
+    """
+    # Define an inner function create_file_list which takes in parameters outdir,method,W,vari,preproc
+    """
+    function create_file_list(outdir,method,W,vari,preproc)
+        # Read the directory specified by outdir
+        allfiles = readdir(outdir)
+        # Split the names of the files in the directory using "_" as the delimiter
+        filenamesplit = split.(allfiles,"_")
+        # Find the indices of the files that match the specified method, W, vari, and preproc
+        method_inds = findall(x->( x[1]==method && x[2] == "$W" && x[4] == "$vari" && x[end][1:4] == preproc),[filenamesplit[i] for i in 1:length(filenamesplit)])
+        # Concatenate the outdir with the matched files
+        files = outdir .* allfiles[method_inds]
+        # Return the list of matched files
+        return files
+    end
+
+    """
+    # Define an inner function read_single_file which takes in parameters filename,yearsamples,N,k
+    """
+    function read_single_file(filename,yearsamples,N=11322,k = 48)
+        # Load the file specified by filename
+        File = load(filename)
+        # Extract the "lambda" variable from the loaded file
+        lambda = File["lambda"]
+        # Extract the "EOF" variable from the loaded file
+        EOF = File["EOF"]
+        # Extract the "signal" variable from the loaded file
+        signal = File["signal"]
+        # Return the extracted variables
+        return lambda,EOF,signal
+    end
+
+    # Create a name variable by concatenating spot, method, W, and vari
+    name = "$(spot)_$(method)_$(W)_$(vari)"
+    # Set N and k to default values
+    N = 5478
+    k = 48
+    # Set yearsamples to 365.25
+    yearsamples=365.25
+    # Set preproc to "raw."
+    preproc="raw."
+    # Concatenate the savedir with the name variable
+    savedir = "/net/scratch/lschulz/modes/"*"name"
+    #data
+    outdir="/net/scratch/lschulz/fluxfullset/"
+
+    # Use the create_file_list function to find the filename that matches the input parameters
+    filename = create_file_list(outdir,method,W,vari,preproc)[spot]
+    # Use the read_single_file function to extract the variables lambda, EOF, and signal from the filename
+    lambda,EOF,signal = read_single_file(filename,yearsamples,N,k)
+    # Save the extracted variables to a JLD file at the specified savedir
+    jldsave(savedir,lambda=lambda,modes=EOF,signal=signal)
+end
+
+
+
+
+
 #----------------------------------------------------------------------
 #data tools
 #----------------------------------------------------------------------
@@ -58,8 +126,8 @@ using SharedArrays
 
     #centralize
     function centralizer(data::Vector{Float32})
-        m = mean(data)
-        cv = std(data)
+        m = Base.mean(data)
+        cv = Base.std(data)
         return  (data.-m)./cv
     end
 
