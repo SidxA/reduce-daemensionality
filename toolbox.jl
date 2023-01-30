@@ -12,7 +12,7 @@ Pkg.activate("reduce_daemensionality_julia")
 using Dates
 function init_logging()
     weekno = week(unix2datetime(time()))
-    datestring = string("KW_",lpad(weekno,2,"0"),"/")
+    datestring = string("KW_2_",lpad(weekno,2,"0"),"/")
     workdir = "/net/home/lschulz/logs/"
     dir = workdir*datestring
     if isdir(dir)==false
@@ -26,6 +26,10 @@ dir = init_logging()
 """
 read in modes
 """
+
+using FileIO
+using JLD2
+
 
 function read_modes_single_file(method,W,vari,spot)
     """
@@ -126,8 +130,8 @@ using SharedArrays
 
     #centralize
     function centralizer(data::Vector{Float32})
-        m = Base.mean(data)
-        cv = Base.std(data)
+        m = mean(data)
+        cv = std(data)
         return  (data.-m)./cv
     end
 
