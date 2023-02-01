@@ -21,3 +21,12 @@
 
     naive iteration of hilbert trafo does not converge
     there is little amplitude modulation on all modes
+
+## 02/01    2h
+    embedding length of 1 year works better
+    minor amplitude modulation on harmonics 2,3,...
+    starts to incorporate different information then resolution of oscillation
+    need some plots to explain this
+    a lot of 'trend' modes in NLSA, sometimes split up of oscillatory  into 2 'linear trend'
+
+    maybe new approach to code logging: new analysis script, instead of rework

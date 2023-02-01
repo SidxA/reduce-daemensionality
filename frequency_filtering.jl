@@ -11,18 +11,39 @@ end
 """
 mode example
 """
+using FileIO
+using JLD2
 
-for spot = 1:20
-    method="diff"
+for spot = 1:5
+    method = "ssa"
+    #method="diff"
     vari = 1
-    W = Int(floor(7*365.25))
-    name = "$(spot)_$(method)_$(W)_$(vari)"
-    outdir="/net/scratch/lschulz/fluxfullset/"
-    yearsamples=365.25
+    #W = Int(floor(7*365.25))
+    #name = "$(spot)_$(method)_$(W)_$(vari)"
+    #outdir="/net/scratch/lschulz/fluxfullset/"
+    yearsamples=365
     preproc="raw."
     filename = create_file_list(outdir,method,W,vari,preproc)[spot]
-    using FileIO
-    using JLD2
+
+    file = load(filename)
+    eof = file["EOF"]
+    lambda = file["lambda"]
+    pc = file["PC"]
+    rc = file["RC"]
+    signal = file["signal"]
+    N = length(signal)
+
+    harmonics_eof = hcat([eof[:,l] .+ 0.5*i for (i,l) in enumerate(1:6)]...)
+    F,ax,s = series(1:W,harmonics_eof',solid_color="black")
+    save(savedirname*"ssa_$(spot)_eof.png",F)
+
+    harmonics_rc = hcat([rc[:,l] .+ i for (i,l) in enumerate(1:6)]...)
+    F,ax,s = series(1:N,harmonics_rc',solid_color="black")
+    save(savedirname*"ssa_$(spot)_rc.png",F)
+
+    method="diff"
+
+    filename = create_file_list(outdir,method,W,vari,preproc)[spot]
     file = load(filename)
     eof = file["EOF"]
     lambda = file["lambda"]
@@ -31,27 +52,30 @@ for spot = 1:20
     signal = file["signal"]
 
 
+    harmonics_eof = hcat([eof[:,l] .+ 0.5*i for (i,l) in enumerate(1:6)]...)
+    F,ax,s = series(1:W,harmonics_eof',solid_color="black")
+    save(savedirname*"nlsa_$(spot)_eof.png",F)
+
+    harmonics_rc = hcat([rc[:,l] .+ i for (i,l) in enumerate(1:6)]...)
+    F,ax,s = series(1:N,harmonics_rc',solid_color="black")
+    save(savedirname*"nlsa_$(spot)_rc.png",F)
+
+
+end
+
+
+"""
     L = []
     for kap = 1:48
         zeros = count_sign_flip(eof[:,kap])
-        if zeros%14 == 0
+        if zeros%2 == 0
             #println("$kap \t $zeros \t $(zeros/14)")
             L = append!(L,kap)
         else
             #println("$kap \t $zeros")
         end
     end
-
-    harmonics = hcat([eof[:,l] .+ 0.5*i for (i,l) in enumerate(L)]...)
-    F,ax,s = series(1:2556,harmonics',solid_color="black")
-    save(savedirname*"$(spot)_eof.png",F)
-
-    F,ax,s = lines(sum(rc[:,1:6],dims=2)[:],solid_color="black")
-    save(savedirname*"$(spot)_rc.png",F)
-
-end
-
-
+"""
 
 
 
