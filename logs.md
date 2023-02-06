@@ -45,3 +45,6 @@
     dirty hard coded filter to find these modes works
     this 'kind-of-works', but really shuldnt be published ?
     
+
+## 02/06 1h
+    combined plotting on the results of the naive hard filtering
