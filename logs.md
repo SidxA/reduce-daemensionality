@@ -48,3 +48,14 @@
 
 ## 02/06 1h
     combined plotting on the results of the naive hard filtering
+
+## 02/08    1h
+    since iterated hilbert trafo does not naturally converge as a frequency estimation criterion,
+    lets use spectral power by fft  to show the harmonic structure
+
+    the question of ridicolous modes in NLSA: compare W=7a with W=1a for all spectral results
+
+    single fft implemented
+    repaired access to the broken metadata file
+
+    need to create large figures for individual spots w. signal, and multiple modes, spectra
