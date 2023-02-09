@@ -59,3 +59,7 @@
     repaired access to the broken metadata file
 
     need to create large figures for individual spots w. signal, and multiple modes, spectra
+
+
+## 02/09    2h
+    put the fourier spectra for individual modes together into large overview plots for W=7 and W=1
