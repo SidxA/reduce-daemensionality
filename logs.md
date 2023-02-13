@@ -63,3 +63,16 @@
 
 ## 02/09    2h
     put the fourier spectra for individual modes together into large overview plots for W=7 and W=1
+
+## 02/13    4h
+    created the cauchy based sorting algorithm for frequency harmonicity estimation based on threshold
+    due to the steepness of the cauchy peaks, the maximum of the residuals couldnt be used for threshold differentiation
+    finally, the un-normalized gauss peaks with free width yielded the best spectral fits
+    finished some threshold estimation table, mediocre results, keep it at conservative 10%
+    finished the sorting and plotting routine to compare SSA with NLSA
+
+    results are pretty miserable: the goal of steady-amplitude trend with individual trends is missed by the selected modes
+    there is still so much amplitude modulation in the RC
+    are the actual EOF responsible for it?
+    jump: they are, lets do a high resolution W=1 re-calculation with half hourly data ATTENTION this would also induce some day night dynamic?
+    so maybe check them manually
