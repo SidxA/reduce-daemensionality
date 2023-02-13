@@ -93,7 +93,7 @@ end
 
 
 
-function mode_harmonicity_estimation_gauss(eof,threshold)
+function mode_harmonicity_estimation_gauss(Eof,threshold)
     li_harmonics = Int64[]
     li_mixed = Int64[]
     li_h_freq = Float64[]
@@ -137,7 +137,7 @@ function mode_harmonicity_estimation_gauss(eof,threshold)
         elseif maximum(residual .+ 0.0)*threshold >= value
             li_residual = append!(li_residual,i)
         else
-            println("no peak")
+            #println("no peak")
         end
 
     end
@@ -150,8 +150,8 @@ end
 print the results for different threshold values
 """
 spot = 19
-outdir="/net/scratch/lschulz/fluxfullset_1a/"
-#meta = load("/net/scratch/lschulz/fluxnetfullset/fullset_15a_gpp_nee_reco_ts.jld2")["meta"]
+outdir="/net/scratch/lschulz/fluxfullset/"
+meta = load("/net/scratch/lschulz/fluxnetfullset/fullset_15a_gpp_nee_reco_ts.jld2")["meta"]
 W = 2556
 preproc = "raw."
 kappa= 48
@@ -430,15 +430,19 @@ save(dir*"test.png",F)
 
 threshold = 10
 savedir=dir*"rec/"
+variable_list = ["GPP","NEE","RECO","soil water content","soil temperature"]
+meta = load("/net/home/lschulz/logs/KW_2_06/meta.jld2")["meta"]
 
-for spot=1:20
+for spot=[1,3,5,9,16],vari=[1,2,4,5]
 
+    println("$spot \t $vari")
     F = Figure(resolution=(1200,800))
 
 
     method = "ssa"
     Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
     file = load(Filename)
+    signal = file["signal"]
     lambda = file["lambda"]
     indices = sortperm(lambda,rev=true)
     Eof = file["EOF"][:,indices]
@@ -537,5 +541,8 @@ for spot=1:20
     scatter!(ax_nlsa_f,freq_domain,signal_domain,color="grey",marker='+')
     scatter!(ax_nlsa_f,freq_domain,trend_domain,color="blue",marker='o')
 
-    save(savedir*"$spot.png",F)
+
+    Label(F[0, :], text = "$(meta[spot,"name"]) $(meta[spot,"IGBP_class"]) $(variable_list[vari])", fontsize = 40)
+
+    save(savedir*"$(spot)_$(vari).png",F)
 end

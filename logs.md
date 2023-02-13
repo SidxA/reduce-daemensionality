@@ -64,7 +64,7 @@
 ## 02/09    2h
     put the fourier spectra for individual modes together into large overview plots for W=7 and W=1
 
-## 02/13    4h
+## 02/13    8h
     created the cauchy based sorting algorithm for frequency harmonicity estimation based on threshold
     due to the steepness of the cauchy peaks, the maximum of the residuals couldnt be used for threshold differentiation
     finally, the un-normalized gauss peaks with free width yielded the best spectral fits
@@ -78,4 +78,4 @@
     so maybe check them manually
 
     the FFt of the NLSA trends have the additional harmonics, this is looking good so far
-    
+    NLSA sucks in the case of some signals, the parameter tuning might not have been good enough
