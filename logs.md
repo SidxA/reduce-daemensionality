@@ -76,3 +76,6 @@
     are the actual EOF responsible for it?
     jump: they are, lets do a high resolution W=1 re-calculation with half hourly data ATTENTION this would also induce some day night dynamic?
     so maybe check them manually
+
+    the FFt of the NLSA trends have the additional harmonics, this is looking good so far
+    

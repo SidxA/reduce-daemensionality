@@ -390,3 +390,152 @@ for spot=1:20
     save(savedir*name*".png",F) #save(savedir*name*".png",F)
 
 end
+
+"""
+check EOF,RC,PC manually with the gaussian peak detection
+"""
+spot= 1
+threshold = 10
+method = "diff"
+Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
+file = load(Filename)
+lambda = file["lambda"]
+indices = sortperm(lambda,rev=true)
+Eof = file["EOF"][:,indices]
+PC = file["PC"][:,indices]
+RC = file["RC"][:,indices]
+lambda = lambda[indices]
+
+
+
+F = Figure(resolution=(1200,400))
+ax_eof = Axis(F[1,1])
+ax_pc = Axis(F[1,2])
+ax_rc = Axis(F[1,3])
+
+
+li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
+
+for i in 1:length(li_harmonics)
+    lines!(ax_eof,1:W,Eof[:,i].+0.1*i,color="grey")
+    lines!(ax_pc,1:N-W+1,PC[:,i].+80*i,color="grey")
+    #lines!(ax_rc,1:N,RC[:,i].+3*i,color="grey")
+end
+
+lines!(ax_rc,1:N,signal,color="grey")
+lines!(ax_rc,1:N,sum(RC[:,li_harmonics],dims=2)[:],color="blue")
+
+save(dir*"test.png",F)
+
+
+threshold = 10
+savedir=dir*"rec/"
+
+for spot=1:20
+
+    F = Figure(resolution=(1200,800))
+
+
+    method = "ssa"
+    Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
+    file = load(Filename)
+    lambda = file["lambda"]
+    indices = sortperm(lambda,rev=true)
+    Eof = file["EOF"][:,indices]
+    PC = file["PC"][:,indices]
+    RC = file["RC"][:,indices]
+    lambda = lambda[indices]
+
+    li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
+
+    val = (round(sum(lambda[li_harmonics]),digits=3))
+    le = length(li_harmonics)
+    val_m = (round(sum(lambda[li_mixed]),digits=3))
+    le_m = length(li_mixed)
+
+    trend = sum(RC[:,li_harmonics],dims=2)[:]
+
+
+    freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
+    freqstart = findall(x->x>=1/12,freqs)[1]
+    freqend = findall(x->x>=6,freqs)[1]
+    freq_domain = freqs[freqstart:freqend]
+
+    Four = fft(signal) |> fftshift
+    signal_domain = abs.(Four[freqstart:freqend]) .* 1000 .+ 10^-6
+    Four = fft(trend) |> fftshift
+    trend_domain = abs.(Four[freqstart:freqend]) .+ 10^-6
+    Four = fft(signal .- trend) |> fftshift
+    res_domain = abs.(Four[freqstart:freqend]) ./ 1000 .+ 10^-6
+
+    ax_ssa = Axis(F[1,1:2],title="SSA: trend of $val captured by $le modes | $val_m lost by mixing of $le_m modes",
+    yticksvisible = false,yticklabelsvisible = false,xlabel="t (d)",ylabel="GPP")
+    ax_ssa_f = Axis(F[1,3],title="SSA FFT spec",yscale=log10,
+    yticksvisible = false,yticklabelsvisible = false,xlabel="f (/a)",ylabel="log rel power")
+
+    lines!(ax_ssa,1:N,signal .- trend .- 4,color="red")
+    lines!(ax_ssa,1:N,signal,color="grey")
+
+    lines!(ax_ssa,1:N,trend,color="blue")
+
+    
+    lines!(ax_ssa_f,freq_domain,res_domain,color="red")
+    lines!(ax_ssa_f,freq_domain,signal_domain,color="grey")
+    lines!(ax_ssa_f,freq_domain,trend_domain,color="blue")
+
+    scatter!(ax_ssa_f,freq_domain,res_domain,color="red",marker='x')
+    scatter!(ax_ssa_f,freq_domain,signal_domain,color="grey",marker='+')
+    scatter!(ax_ssa_f,freq_domain,trend_domain,color="blue",marker='o')
+
+    method = "diff"
+    Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
+    file = load(Filename)
+    lambda = file["lambda"]
+    indices = sortperm(lambda,rev=true)
+    Eof = file["EOF"][:,indices]
+    PC = file["PC"][:,indices]
+    RC = file["RC"][:,indices]
+    lambda = lambda[indices]
+
+    li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
+
+    val = (round(sum(lambda[li_harmonics]),digits=3))
+    le = length(li_harmonics)
+    val_m = (round(sum(lambda[li_mixed]),digits=3))
+    le_m = length(li_mixed)
+
+    trend = sum(RC[:,li_harmonics],dims=2)[:]
+
+
+    freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
+    freqstart = findall(x->x>=1/12,freqs)[1]
+    freqend = findall(x->x>=6,freqs)[1]
+    freq_domain = freqs[freqstart:freqend]
+
+    Four = fft(signal) |> fftshift
+    signal_domain = abs.(Four[freqstart:freqend]) .* 1000 .+ 10^-6
+    Four = fft(trend) |> fftshift
+    trend_domain = abs.(Four[freqstart:freqend]) .+ 10^-6
+    Four = fft(signal .- trend) |> fftshift
+    res_domain = abs.(Four[freqstart:freqend]) ./ 1000 .+ 10^-6
+
+    ax_nlsa = Axis(F[2,1:2],title="NLSA: trend of $val captured by $le modes | $val_m lost by mixing of $le_m modes",
+    yticksvisible = false,yticklabelsvisible = false,xlabel="t (d)",ylabel="GPP")
+    ax_nlsa_f = Axis(F[2,3],title="NLSA FFT spec",yscale=log10,
+    yticksvisible = false,yticklabelsvisible = false,xlabel="f (/a)",ylabel="log rel power")
+
+    lines!(ax_nlsa,1:N,signal .- trend .-4 ,color="red",label="residual")
+    lines!(ax_nlsa,1:N,signal,color="grey",label="signal")
+    lines!(ax_nlsa,1:N,trend,color="blue",label="trend")
+    axislegend(ax_nlsa)
+    
+    lines!(ax_nlsa_f,freq_domain,res_domain,color="red")
+    lines!(ax_nlsa_f,freq_domain,signal_domain,color="grey")
+    lines!(ax_nlsa_f,freq_domain,trend_domain,color="blue")
+
+    scatter!(ax_nlsa_f,freq_domain,res_domain,color="red",marker='x')
+    scatter!(ax_nlsa_f,freq_domain,signal_domain,color="grey",marker='+')
+    scatter!(ax_nlsa_f,freq_domain,trend_domain,color="blue",marker='o')
+
+    save(savedir*"$spot.png",F)
+end
