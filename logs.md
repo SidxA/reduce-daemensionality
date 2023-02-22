@@ -79,3 +79,7 @@
 
     the FFt of the NLSA trends have the additional harmonics, this is looking good so far
     NLSA sucks in the case of some signals, the parameter tuning might not have been good enough
+
+
+## 02/2022  2h
+    presentation pictures
