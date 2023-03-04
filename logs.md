@@ -80,6 +80,17 @@
     the FFt of the NLSA trends have the additional harmonics, this is looking good so far
     NLSA sucks in the case of some signals, the parameter tuning might not have been good enough
 
+##  02/15   8h
+    gaussian based harmonicity algorithm:
+    unnormalized spectral power
+    and free third gaussian parameter
+    lead to pretty stable results
 
-## 02/2022  2h
+## 02/22  2h
     presentation pictures
+
+##  03/02   4h
+    figures work: fft peak & seasonality behavior
+
+##  03/04   2h
+    figures work: comparison ssa/nlsa and fundamental/harmonic
