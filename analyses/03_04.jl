@@ -196,8 +196,9 @@ xminorticks = IntervalsBetween(3),
 )
 
 lw = 3
+lw_s = 1
 ms = 4
-col_fundamental = "red"
+col_fundamental = "orangered"
 col_harmonic = "blue"
 col_signal = "black"
 
@@ -234,9 +235,9 @@ freqstart = findall(x->x>=1/12,freqs)[1]
 freqend = findall(x->x>=6,freqs)[1]
 freq_domain = freqs[freqstart:freqend]
 
-spec_fun = (abs.(fft(fundamental) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^12
-spec_res_fun = (abs.(fft(res_fund) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^4
-spec_har = (abs.(fft(harmonic) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^8
+spec_fun = (abs.(fft(fundamental) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^6
+spec_res_fun = (abs.(fft(res_fund) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^6
+spec_har = (abs.(fft(harmonic) |> fftshift)[freqstart:freqend] |> normalizer )
 spec_res_har = (abs.(fft(res_harm) |> fftshift)[freqstart:freqend] |> normalizer )
 spec_signal = (abs.(fft(signal) |> fftshift)[freqstart:freqend] |> normalizer )
 
@@ -248,22 +249,26 @@ xminorticks = IntervalsBetween(7),
 yscale = log10)
 
 #signal
-scatter!(ax,freq_domain,spec_signal .*10^8,linewidth=lw,
+scatter!(ax,freq_domain,spec_signal,linewidth=lw,
 color=col_signal,marker=:x,markersize=ms)
-scatter!(ax,freq_domain,spec_signal .*10^12,linewidth=lw,
+scatter!(ax,freq_domain,spec_signal .*10^6,linewidth=lw,
 color=col_signal,marker=:x,markersize=ms,label="signal")
+lines!(ax,freq_domain,spec_signal,linewidth=lw_s,
+color=col_signal,linestyle=:solid)
+lines!(ax,freq_domain,spec_signal .* 10^6,linewidth=lw_s,
+color=col_signal,linestyle=:solid)
 
 #fundamental
 lines!(ax,freq_domain,spec_fun,linewidth=lw,
 color=col_fundamental,linestyle=:solid)
 lines!(ax,freq_domain,spec_res_fun,linewidth=lw,
-color=col_fundamental,linestyle=:solid)
+color=col_fundamental,linestyle=:dashdot)
 
 #harmonic
 lines!(ax,freq_domain,spec_har,linewidth=lw,
 color=col_harmonic,linestyle=:solid)
 lines!(ax,freq_domain,spec_res_har,linewidth=lw,
-color=col_harmonic,linestyle=:solid)
+color=col_harmonic,linestyle=:dashdot)
 
 hideydecorations!(ax)
 hidespines!(ax, :t, :r, :l) # only top and right
@@ -326,9 +331,9 @@ freqstart = findall(x->x>=1/12,freqs)[1]
 freqend = findall(x->x>=6,freqs)[1]
 freq_domain = freqs[freqstart:freqend]
 
-spec_ssa = (abs.(fft(ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^12
-spec_res_ssa = (abs.(fft(signal .- ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^4
-spec_nlsa = (abs.(fft(nlsa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^8
+spec_ssa = (abs.(fft(ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^6
+spec_res_ssa = (abs.(fft(signal .- ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^6
+spec_nlsa = (abs.(fft(nlsa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer)
 spec_res_nlsa = (abs.(fft(signal .- nlsa_trend_harm) |> fftshift)[freqstart:freqend] |> normalizer )
 spec_signal = (abs.(fft(signal) |> fftshift)[freqstart:freqend] |> normalizer )
 
@@ -341,22 +346,26 @@ xminorticks = IntervalsBetween(7),
 yscale = log10)
 
 #signal
-scatter!(ax,freq_domain,spec_signal .*10^8,linewidth=lw,
+scatter!(ax,freq_domain,spec_signal,linewidth=lw,
 color=col_signal,marker=:x,markersize=ms)
-scatter!(ax,freq_domain,spec_signal .*10^12,linewidth=lw,
+scatter!(ax,freq_domain,spec_signal .*10^6,linewidth=lw,
 color=col_signal,marker=:x,markersize=ms,label="signal")
+lines!(ax,freq_domain,spec_signal,linewidth=lw_s,
+color=col_signal,linestyle=:solid)
+lines!(ax,freq_domain,spec_signal .* 10^6,linewidth=lw_s,
+color=col_signal,linestyle=:solid)
 
 #ssa
 lines!(ax,freq_domain,spec_ssa,linewidth=lw,
 color=col_ssa,linestyle=:solid)
 lines!(ax,freq_domain,spec_res_ssa,linewidth=lw,
-color=col_ssa,linestyle=:solid)
+color=col_ssa,linestyle=:dashdot)
 
 #nlsa
 lines!(ax,freq_domain,spec_nlsa,linewidth=lw,
 color=col_nlsa,linestyle=:solid)
 lines!(ax,freq_domain,spec_res_nlsa,linewidth=lw,
-color=col_nlsa,linestyle=:solid)
+color=col_nlsa,linestyle=:dashdot)
 
 hideydecorations!(ax)
 hidespines!(ax, :t, :r, :l) # only top and right

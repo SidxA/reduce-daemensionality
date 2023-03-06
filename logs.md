@@ -94,3 +94,11 @@
 
 ##  03/04   2h
     figures work: comparison ssa/nlsa and fundamental/harmonic
+
+## 03/05    2h
+    bigf figure
+    modes figure
+    reconstructions figure
+
+## 03/06    1h
+    started working on the year diagram for amplitude and phase
