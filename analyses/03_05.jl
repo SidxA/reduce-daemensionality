@@ -1,3 +1,7 @@
+
+include("/net/home/lschulz/reduce-daemensionality/toolbox.jl")
+using CairoMakie
+
 """
 recreate the bigf figure
 """
@@ -13,7 +17,7 @@ function single_robustness(outdir,method,W,vari,preproc,kappa,spot,yearsamples)
     return RC_l,lambda_l,protofreq_l
 end
 
-spot = 19
+spot = 3
 outdir="/net/scratch/lschulz/fluxfullset/"
 meta = load("/net/scratch/lschulz/fluxnetfullset/fullset_15a_gpp_nee_reco_ts.jld2")["meta"]
 W = 2556
@@ -37,9 +41,10 @@ xtic = 1:7#round.(Array([1/7:1/7:5/7...,[1,2,3,4,7] ...]),digits=2)
 
 color_ssa = "darkgreen"
 color_nlsa = "purple"
+ms = 18
 
 F = Figure(resolution= (800,500))
-ax_fft = Axis(F[1,1:2],limits=(1/9,7,10^-4,3),xticks=xtic)
+ax_fft = Axis(F[1,1:2],limits=(1/9,7,0.0001,1),xticks=xtic,yscale=log10)
 ax_both = Axis(F[2,1:2],yscale=log10,#xscale=log10,
 limits=(1/9,7,10^-4,0.9),xticks=xtic,
 xminorticksvisible = true,
@@ -76,7 +81,7 @@ for (i,method) = enumerate(["ssa","diff"])
     lambda = r_GPP[2]
     protofreq = r_GPP[3]
     scatter!(ax_both,protofreq,lambda,marker=[:cross,:xcross][i],
-    markersize=16,markerstrokewidth=4,color=[color_ssa,color_nlsa][i])
+    markersize=ms,markerstrokewidth=4,color=[color_ssa,color_nlsa][i])
 
     h_weights =fit(Histogram,protofreq,weights(lambda),bins).weights
     #lines!(ax_hist,bins[1:end-1],10^-5 .+ h_weights,label=["SSA","NLSA"][i])
@@ -86,7 +91,7 @@ for (i,method) = enumerate(["ssa","diff"])
     Four = fft(sum(RC,dims=2)[:]) |> fftshift
     freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
     Four ./= maximum(abs.(Four))
-    lines!(ax_fft,freqs[2740:end], abs.(Four)[2740:end] .+ i,
+    lines!(ax_fft,freqs[2740:end], abs.(Four)[2740:end],
     color=[color_ssa,color_nlsa][i],label=["SSA","NLSA"][i])
 end
 
@@ -101,11 +106,12 @@ hidespines!(ax_fft, :t, :r, :b)
 hidespines!(ax_spec, :t, :r)
 hideydecorations!(ax_spec,grid=false)
 linkxaxes!(ax_fft,ax_both)
+linkyaxes!(ax_fft,ax_both)
 
-hidedecorations!(ax_fft)
+hidexdecorations!(ax_fft)
 
 colgap!(F.layout,1,0)
-rowgap!(F.layout,1,3)
+rowgap!(F.layout,1,6)
 
 
 save(dir*"bigf.png",F)
@@ -220,15 +226,24 @@ file = load(Filename)
 rc_nlsa = sum(file["RC"],dims=2)[:]
 signal = file["signal"]
 
+color_ssa = "darkgreen"
+color_nlsa = "purple"
+lw = 2
+ms = 5
+
 years = ((1:5478) ./ 365) .+ 1985
 
-F = Figure(resoultino=(800,400))
+F = Figure(resolution=(800,300))
 
-ax = Axis(F[1,1],xticks=1985:3:2000)
+ax = Axis(F[1,1],xticks=1985:3:2000,
+xminorticksvisible = true,
+xminorgridvisible = true,
+xminorticks = IntervalsBetween(3),)
 
-lines!(ax,years,signal,color="black")
-lines!(ax,years,rc_ssa .+ 4,color=color_ssa)
-lines!(ax,years,rc_nlsa .+ 8,color=color_nlsa)
+scatter!(ax,years,signal,color="black",markersize = ms,marker=:x)
+lines!(ax,years,signal,color="black",markersize = 1)
+lines!(ax,years,rc_ssa,color=color_ssa,linewidth=lw)
+lines!(ax,years,rc_nlsa,color=color_nlsa,linewidth=lw)
 
 hideydecorations!(ax)
 hidespines!(ax,:t,:r)

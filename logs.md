@@ -102,3 +102,6 @@
 
 ## 03/06    1h
     started working on the year diagram for amplitude and phase
+
+## 03/07    2h
+    refined figures from 03/04 and 03/05
