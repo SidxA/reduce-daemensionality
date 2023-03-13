@@ -102,366 +102,283 @@ t = t0:Ts:tmax
 tw = t0:Ts:(t0+(W-1)*Ts)
 
 
-savedirname = dir*"poster/"
-spot = 3
-threshold = 10
-vari=1
+savedir = dir#*"poster/"
 
-#ssa
 
-method="ssa"
-Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
-file = load(Filename)
-signal = file["signal"]
-lambda = file["lambda"]
-indices = sortperm(lambda,rev=true)
-Eof = file["EOF"][:,indices]
-PC = file["PC"][:,indices]
-RC = file["RC"][:,indices]
-lambda = lambda[indices]
-
-# ssa reconstruction: freq 1
-
-li_harmonics=[1,2]
-val = (round(sum(lambda[li_harmonics]),digits=3))
-le = length(li_harmonics)
-#val_m = (round(sum(lambda[li_mixed]),digits=3))
-#le_m = length(li_mixed)
-ssa_trend_first = sum(RC[:,li_harmonics],dims=2)[:]
-
-# ssa reconstruction: freq harmonics
-
-li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
-val = (round(sum(lambda[li_harmonics]),digits=3))
-le = length(li_harmonics)
-#val_m = (round(sum(lambda[li_mixed]),digits=3))
-#le_m = length(li_mixed)
-ssa_trend_harm = sum(RC[:,li_harmonics],dims=2)[:]
-
-#nlsa 
-
-method="diff"
-Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
-file = load(Filename)
-signal = file["signal"]
-lambda = file["lambda"]
-indices = sortperm(lambda,rev=true)
-Eof = file["EOF"][:,indices]
-PC = file["PC"][:,indices]
-RC = file["RC"][:,indices]
-lambda = lambda[indices]
-
-# nlsa reconstruction: freq 1
-
-li_harmonics=[1,2]
-val = (round(sum(lambda[li_harmonics]),digits=3))
-le = length(li_harmonics)
-#val_m = (round(sum(lambda[li_mixed]),digits=3))
-#le_m = length(li_mixed)
-nlsa_trend_first = sum(RC[:,li_harmonics],dims=2)[:]
-
-# nlsa reconstruction: freq harmonics
-
-li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
-val = (round(sum(lambda[li_harmonics]),digits=3))
-le = length(li_harmonics)
-#val_m = (round(sum(lambda[li_mixed]),digits=3))
-#le_m = length(li_mixed)
-nlsa_trend_harm = sum(RC[:,li_harmonics],dims=2)[:]
-
-trajectorymatrix = hcat(
-ssa_trend_first .+ 0.0,
-ssa_trend_harm .+ 2.0,
-nlsa_trend_first.+ 4.0,
-nlsa_trend_harm .+ 6.0)
-
-"""
-plotting procedure : fundamental versus harmonic
-"""
-
-#signals
-
-years = 1985 .+ ((1:5478) ./ 365)
-fundamental = ssa_trend_first
-harmonic = ssa_trend_harm
-res_fund = signal .- fundamental
-res_harm = signal .- harmonic
-
-F = Figure(resolution=(800,500))
-ax = Axis(F[1,1],
-xticks = 1985:3:2000,
-xminorticksvisible = true,
-xminorgridvisible = true,
-xminorticks = IntervalsBetween(3),
-)
-
-lw = 2
+lw = 3
 lw_s = 1
 ms = 4
 col_fundamental = "orangered"
 col_harmonic = "blue"
-col_signal = "black"
-
-#signal background
-
-scatter!(ax,years,signal .+ 3.0,linewidth=lw,
-color=col_signal,marker=:x,markersize=ms)
-lines!(ax,years,signal .+ 3.0,linewidth=1,
-color=col_signal,marker=:x,markersize=ms,label="signal")
-#scatter!(ax,years,signal .+ 12.0,linewidth=lw,
-#color=col_signal,marker=:x,markersize=ms,label="signal")
-
-#fundamental
-lines!(ax,years,fundamental .+ 3.0,linewidth=lw,
-color=col_fundamental,linestyle=:solid,label="fundamental")
-lines!(ax,years,res_fund .+ 0.0,linewidth=lw_s,
-color=col_fundamental,linestyle=:solid)
-#harmonic
-lines!(ax,years,harmonic .+ 3.0,linewidth=lw,
-color=col_harmonic,linestyle=:solid,label="harmonic")
-lines!(ax,years,res_harm .+ 0.0,linewidth=lw_s,
-color=col_harmonic,linestyle=:solid)
-
-hideydecorations!(ax)
-hidespines!(ax, :t, :r, :l) # only top and right
-#axislegend(ax)
-#axislegend(ax)
-save(dir*"seasons.png",F)
-
-#now the additional FFT
-
-ms = 8
-odi = 4.5 #log offset 
-normalizer(x) = x./maximum(x)
-freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
-freqstart = findall(x->x>=1/12,freqs)[1]
-freqend = findall(x->x>=6,freqs)[1]
-freq_domain = freqs[freqstart:freqend]
-
-spec_fun = (abs.(fft(fundamental) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^odi
-spec_res_fun = (abs.(fft(res_fund) |> fftshift)[freqstart:freqend] |> normalizer )
-spec_har = (abs.(fft(harmonic) |> fftshift)[freqstart:freqend] |> normalizer )  .* 10^odi
-spec_res_har = (abs.(fft(res_harm) |> fftshift)[freqstart:freqend] |> normalizer )
-spec_signal = (abs.(fft(signal) |> fftshift)[freqstart:freqend] |> normalizer )
-
-F = Figure(resolution=(800,500))
-ax = Axis(F[1,1],
-xminorticksvisible = true,
-xminorgridvisible = true,
-xminorticks = IntervalsBetween(7),
-yscale = log10)
-
-#signal
-#scatter!(ax,freq_domain,spec_signal,linewidth=lw,
-#color=col_signal,marker=:x,markersize=ms)
-scatter!(ax,freq_domain,spec_signal .*10^odi,linewidth=lw,
-color=col_signal,marker=:x,markersize=ms,label="signal")
-#lines!(ax,freq_domain,spec_signal,linewidth=lw_s,
-#color=col_signal,linestyle=:solid)
-lines!(ax,freq_domain,spec_signal .* 10^odi,linewidth=lw_s,
-color=col_signal,linestyle=:solid)
-
-#fundamental
-lines!(ax,freq_domain,spec_fun,linewidth=lw,
-color=col_fundamental,linestyle=:solid)
-lines!(ax,freq_domain,spec_res_fun,linewidth=lw,
-color=col_fundamental,linestyle=:solid)
-
-#harmonic
-lines!(ax,freq_domain,spec_har,linewidth=lw,
-color=col_harmonic,linestyle=:solid)
-lines!(ax,freq_domain,spec_res_har,linewidth=lw,
-color=col_harmonic,linestyle=:solid)
-
-hideydecorations!(ax)
-hidespines!(ax, :t, :r, :l) # only top and right
-#axislegend(ax)
-
-save(dir*"seasons_spec.png",F)
-
-
-"""
-plotting procedure : nlsa versus ssa
-"""
-
-
-F = Figure(resolution=(800,500))
-ax = Axis(F[1,1],
-xticks = 1985:3:2000,
-xminorticksvisible = true,
-xminorgridvisible = true,
-xminorticks = IntervalsBetween(3),
-)
-
-lw = 2
-lw_s = 1
+col_signal = "grey50"
 col_ssa = "darkgreen"
 col_nlsa = "purple"
-col_signal = "black"
 offset = 2.5
-ms = 4
-
-#signal background
-
-scatter!(ax,years,signal .+ offset,linewidth=lw,
-color=col_signal,marker=:x,markersize=ms)
-lines!(ax,years,signal .+ offset,linewidth=lw_s,
-color=col_signal,marker=:x,markersize=ms)
-#scatter!(ax,years,signal .+ 12.0,linewidth=lw,
-#color=col_signal,marker=:x,markersize=ms,label="signal")
-
-#ssa
-lines!(ax,years,ssa_trend_harm .+ offset,linewidth=lw,
-color=col_ssa,linestyle=:solid,label="ssa")
-lines!(ax,years,signal .- ssa_trend_harm .+ 0,linewidth=lw_s,
-color=col_ssa,linestyle=:solid,label="ssa")
-
-#nlsa
-lines!(ax,years,nlsa_trend_harm .+ offset,linewidth=lw,
-color=col_nlsa,linestyle=:solid,label="nlsa")
-lines!(ax,years,signal .- nlsa_trend_harm,linewidth=lw_s,
-color=col_nlsa,linestyle=:solid,label="nlsa")
-
-hideydecorations!(ax)
-hidespines!(ax, :t, :r, :l) # only top and right
-#axislegend(ax)
-
-save(dir*"comp.png",F)
-
-#now the additional FFT
-
-ms = 8
-odi = 4.5
-normalizer(x) = x./maximum(x)
-freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
-freqstart = findall(x->x>=1/12,freqs)[1]
-freqend = findall(x->x>=6,freqs)[1]
-freq_domain = freqs[freqstart:freqend]
-
-spec_ssa = (abs.(fft(ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^odi
-spec_res_ssa = (abs.(fft(signal .- ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer)
-spec_nlsa = (abs.(fft(nlsa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^odi
-spec_res_nlsa = (abs.(fft(signal .- nlsa_trend_harm) |> fftshift)[freqstart:freqend] |> normalizer )
-spec_signal = (abs.(fft(signal) |> fftshift)[freqstart:freqend] |> normalizer )
 
 
-F = Figure(resolution=(800,500))
-ax = Axis(F[1,1],
-xminorticksvisible = true,
-xminorgridvisible = true,
-xminorticks = IntervalsBetween(7),
-yscale = log10)
+for spot in [1]
 
-#signal
-#scatter!(ax,freq_domain,spec_signal,linewidth=lw,
-#color=col_signal,marker=:x,markersize=ms)
-scatter!(ax,freq_domain,spec_signal .*10^odi,linewidth=lw,
-color=col_signal,marker=:x,markersize=ms,label="signal")
-#lines!(ax,freq_domain,spec_signal,linewidth=lw_s,
-#color=col_signal,linestyle=:solid)
-lines!(ax,freq_domain,spec_signal .* 10^odi,linewidth=lw_s,
-color=col_signal,linestyle=:solid)
+    threshold = 10
+    vari=1
 
-#ssa
-lines!(ax,freq_domain,spec_ssa,linewidth=lw,
-color=col_ssa,linestyle=:solid)
-lines!(ax,freq_domain,spec_res_ssa,linewidth=lw,
-color=col_ssa,linestyle=:solid)
+    #ssa
 
-#nlsa
-lines!(ax,freq_domain,spec_nlsa,linewidth=lw,
-color=col_nlsa,linestyle=:solid)
-lines!(ax,freq_domain,spec_res_nlsa,linewidth=lw,
-color=col_nlsa,linestyle=:solid)
+    method="ssa"
+    Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
+    file = load(Filename)
+    signal = file["signal"]
+    lambda = file["lambda"]
+    indices = sortperm(lambda,rev=true)
+    Eof = file["EOF"][:,indices]
+    PC = file["PC"][:,indices]
+    RC = file["RC"][:,indices]
+    lambda = lambda[indices]
 
-hideydecorations!(ax)
-hidespines!(ax, :t, :r, :l) # only top and right
-#axislegend(ax)
+    # ssa reconstruction: freq 1
 
-save(dir*"comp_spec.png",F)
+    li_harmonics=[1,2]
+    val = (round(sum(lambda[li_harmonics]),digits=3))
+    le = length(li_harmonics)
+    #val_m = (round(sum(lambda[li_mixed]),digits=3))
+    #le_m = length(li_mixed)
+    ssa_trend_first = sum(RC[:,li_harmonics],dims=2)[:]
+
+    # ssa reconstruction: freq harmonics
+
+    li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
+    val = (round(sum(lambda[li_harmonics]),digits=3))
+    le = length(li_harmonics)
+    #val_m = (round(sum(lambda[li_mixed]),digits=3))
+    #le_m = length(li_mixed)
+    ssa_trend_harm = sum(RC[:,li_harmonics],dims=2)[:]
+
+    #nlsa 
+
+    method="diff"
+    Filename = create_file_list(outdir,method,W,vari,preproc)[spot]
+    file = load(Filename)
+    signal = file["signal"]
+    lambda = file["lambda"]
+    indices = sortperm(lambda,rev=true)
+    Eof = file["EOF"][:,indices]
+    PC = file["PC"][:,indices]
+    RC = file["RC"][:,indices]
+    lambda = lambda[indices]
+
+    # nlsa reconstruction: freq 1
+
+    li_harmonics=[1,2]
+    val = (round(sum(lambda[li_harmonics]),digits=3))
+    le = length(li_harmonics)
+    #val_m = (round(sum(lambda[li_mixed]),digits=3))
+    #le_m = length(li_mixed)
+    nlsa_trend_first = sum(RC[:,li_harmonics],dims=2)[:]
+
+    # nlsa reconstruction: freq harmonics
+
+    li_harmonics,li_mixed,li_h_freq,li_m_freq,li_residual = mode_harmonicity_estimation_gauss(Eof,threshold)
+    val = (round(sum(lambda[li_harmonics]),digits=3))
+    le = length(li_harmonics)
+    #val_m = (round(sum(lambda[li_mixed]),digits=3))
+    #le_m = length(li_mixed)
+    nlsa_trend_harm = sum(RC[:,li_harmonics],dims=2)[:]
+
+    trajectorymatrix = hcat(
+    ssa_trend_first .+ 0.0,
+    ssa_trend_harm .+ 2.0,
+    nlsa_trend_first.+ 4.0,
+    nlsa_trend_harm .+ 6.0)
+
+    """
+    plotting procedure : fundamental versus harmonic
+    """
+
+    #signals
+
+    years = 2005 .+ ((1:5478) ./ 365)
+    fundamental = ssa_trend_first
+    harmonic = ssa_trend_harm
+    res_fund = signal .- fundamental
+    res_harm = signal .- harmonic
+
+    F = Figure(resolution=(800,500))
+    ax = Axis(F[1,1],
+    xticks = 2005:3:2020,
+    xminorticksvisible = true,
+    xminorgridvisible = true,
+    xminorticks = IntervalsBetween(3),
+    )
+
+    #signal background
+
+    scatter!(ax,years,signal .+ 3.0,linewidth=lw,
+    color=col_signal,marker=:x,markersize=ms)
+    lines!(ax,years,signal .+ 3.0,linewidth=1,
+    color=col_signal,marker=:x,markersize=ms,label="signal")
+    #scatter!(ax,years,signal .+ 12.0,linewidth=lw,
+    #color=col_signal,marker=:x,markersize=ms,label="signal")
+
+    #fundamental
+    lines!(ax,years,fundamental .+ 3.0,linewidth=lw,
+    color=col_fundamental,linestyle=:solid,label="fundamental")
+    lines!(ax,years,res_fund .+ 0.0,linewidth=lw_s,
+    color=col_fundamental,linestyle=:solid)
+    #harmonic
+    lines!(ax,years,harmonic .+ 3.0,linewidth=lw,
+    color=col_harmonic,linestyle=:solid,label="harmonic")
+    lines!(ax,years,res_harm .+ 0.0,linewidth=lw_s,
+    color=col_harmonic,linestyle=:solid)
+
+    hideydecorations!(ax)
+    hidespines!(ax, :t, :r, :l) # only top and right
+    #axislegend(ax)
+    #axislegend(ax)
+    save(savedir*"$(spot)_seasons.png",F)
+
+    #now the additional FFT
+
+    ms = 8
+    odi = 4.5 #log offset 
+    normalizer(x) = x./maximum(x)
+    freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
+    freqstart = findall(x->x>=1/12,freqs)[1]
+    freqend = findall(x->x>=6,freqs)[1]
+    freq_domain = freqs[freqstart:freqend]
+
+    spec_fun = (abs.(fft(fundamental) |> fftshift)[freqstart:freqend] |> normalizer ) .* 10^odi
+    spec_res_fun = (abs.(fft(res_fund) |> fftshift)[freqstart:freqend] |> normalizer )
+    spec_har = (abs.(fft(harmonic) |> fftshift)[freqstart:freqend] |> normalizer )  .* 10^odi
+    spec_res_har = (abs.(fft(res_harm) |> fftshift)[freqstart:freqend] |> normalizer )
+    spec_signal = (abs.(fft(signal) |> fftshift)[freqstart:freqend] |> normalizer )
+
+    F = Figure(resolution=(800,500))
+    ax = Axis(F[1,1],
+    xminorticksvisible = true,
+    xminorgridvisible = true,
+    xminorticks = IntervalsBetween(7),
+    yscale = log10)
+
+    #signal
+    #scatter!(ax,freq_domain,spec_signal,linewidth=lw,
+    #color=col_signal,marker=:x,markersize=ms)
+    scatter!(ax,freq_domain,spec_signal .*10^odi,linewidth=lw,
+    color=col_signal,marker=:x,markersize=ms,label="signal")
+    #lines!(ax,freq_domain,spec_signal,linewidth=lw_s,
+    #color=col_signal,linestyle=:solid)
+    lines!(ax,freq_domain,spec_signal .* 10^odi,linewidth=lw_s,
+    color=col_signal,linestyle=:solid)
+
+    #fundamental
+    lines!(ax,freq_domain,spec_fun,linewidth=lw,
+    color=col_fundamental,linestyle=:solid)
+    lines!(ax,freq_domain,spec_res_fun,linewidth=lw,
+    color=col_fundamental,linestyle=:solid)
+
+    #harmonic
+    lines!(ax,freq_domain,spec_har,linewidth=lw,
+    color=col_harmonic,linestyle=:solid)
+    lines!(ax,freq_domain,spec_res_har,linewidth=lw,
+    color=col_harmonic,linestyle=:solid)
+
+    hideydecorations!(ax)
+    hidespines!(ax, :t, :r, :l) # only top and right
+    #axislegend(ax)
+
+    save(savedir*"$(spot)_seasons_spec.png",F)
 
 
+    """
+    plotting procedure : nlsa versus ssa
+    """
 
 
+    F = Figure(resolution=(800,500))
+    ax = Axis(F[1,1],
+    xticks = 2005:3:2020,
+    xminorticksvisible = true,
+    xminorgridvisible = true,
+    xminorticks = IntervalsBetween(3),
+    )
 
 
+    #signal background
+
+    scatter!(ax,years,signal .+ offset,linewidth=lw,
+    color=col_signal,marker=:x,markersize=ms)
+    lines!(ax,years,signal .+ offset,linewidth=lw_s,
+    color=col_signal,marker=:x,markersize=ms)
+    #scatter!(ax,years,signal .+ 12.0,linewidth=lw,
+    #color=col_signal,marker=:x,markersize=ms,label="signal")
+
+    #ssa
+    lines!(ax,years,ssa_trend_harm .+ offset,linewidth=lw,
+    color=col_ssa,linestyle=:solid,label="ssa")
+    lines!(ax,years,signal .- ssa_trend_harm .+ 0,linewidth=lw_s,
+    color=col_ssa,linestyle=:solid,label="ssa")
+
+    #nlsa
+    lines!(ax,years,nlsa_trend_harm .+ offset,linewidth=lw,
+    color=col_nlsa,linestyle=:solid,label="nlsa")
+    lines!(ax,years,signal .- nlsa_trend_harm,linewidth=lw_s,
+    color=col_nlsa,linestyle=:solid,label="nlsa")
+
+    hideydecorations!(ax)
+    hidespines!(ax, :t, :r, :l) # only top and right
+    #axislegend(ax)
+
+    save(savedir*"$(spot)_comp.png",F)
+
+    #now the additional FFT
+
+    ms = 8
+    odi = 4.5
+    normalizer(x) = x./maximum(x)
+    freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
+    freqstart = findall(x->x>=1/12,freqs)[1]
+    freqend = findall(x->x>=6,freqs)[1]
+    freq_domain = freqs[freqstart:freqend]
+
+    spec_ssa = (abs.(fft(ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^odi
+    spec_res_ssa = (abs.(fft(signal .- ssa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer)
+    spec_nlsa = (abs.(fft(nlsa_trend_harm) |> fftshift)[freqstart:freqend]  |> normalizer) .* 10^odi
+    spec_res_nlsa = (abs.(fft(signal .- nlsa_trend_harm) |> fftshift)[freqstart:freqend] |> normalizer )
+    spec_signal = (abs.(fft(signal) |> fftshift)[freqstart:freqend] |> normalizer )
 
 
+    F = Figure(resolution=(800,500))
+    ax = Axis(F[1,1],
+    xminorticksvisible = true,
+    xminorgridvisible = true,
+    xminorticks = IntervalsBetween(7),
+    yscale = log10)
 
+    #signal
+    #scatter!(ax,freq_domain,spec_signal,linewidth=lw,
+    #color=col_signal,marker=:x,markersize=ms)
+    scatter!(ax,freq_domain,spec_signal .*10^odi,linewidth=lw,
+    color=col_signal,marker=:x,markersize=ms,label="signal")
+    #lines!(ax,freq_domain,spec_signal,linewidth=lw_s,
+    #color=col_signal,linestyle=:solid)
+    lines!(ax,freq_domain,spec_signal .* 10^odi,linewidth=lw_s,
+    color=col_signal,linestyle=:solid)
 
+    #ssa
+    lines!(ax,freq_domain,spec_ssa,linewidth=lw,
+    color=col_ssa,linestyle=:solid)
+    lines!(ax,freq_domain,spec_res_ssa,linewidth=lw,
+    color=col_ssa,linestyle=:solid)
 
+    #nlsa
+    lines!(ax,freq_domain,spec_nlsa,linewidth=lw,
+    color=col_nlsa,linestyle=:solid)
+    lines!(ax,freq_domain,spec_res_nlsa,linewidth=lw,
+    color=col_nlsa,linestyle=:solid)
 
+    hideydecorations!(ax)
+    hidespines!(ax, :t, :r, :l) # only top and right
+    #axislegend(ax)
 
+    save(savedir*"$(spot)_comp_spec.png",F)
 
-
-freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
-freqstart = findall(x->x>=1/12,freqs)[1]
-freqend = findall(x->x>=6,freqs)[1]
-freq_domain = freqs[freqstart:freqend]
-
-Four = fft(signal) |> fftshift
-signal_domain = abs.(Four[freqstart:freqend]) .* 1000 .+ 10^-6
-Four = fft(trend) |> fftshift
-trend_domain = abs.(Four[freqstart:freqend]) .+ 10^-6
-Four = fft(signal .- trend) |> fftshift
-res_domain = abs.(Four[freqstart:freqend]) ./ 1000 .+ 10^-6
-
-ax_nlsa = Axis(F[1,1:2],title="the first yearly double mode captures $val",
-yticksvisible = false,yticklabelsvisible = false,xlabel="t (d)",ylabel="GPP")
-ax_nlsa_f = Axis(F[1,3],title="FFT spec",yscale=log10,
-yticksvisible = false,yticklabelsvisible = false,xlabel="f (/a)",ylabel="log rel power")
-
-lines!(ax_nlsa,1:N,signal .- trend .-4 ,color="red",label="residual")
-lines!(ax_nlsa,1:N,signal,color="grey",label="signal")
-lines!(ax_nlsa,1:N,trend,color="blue",label="trend")
-axislegend(ax_nlsa)
-
-lines!(ax_nlsa_f,freq_domain,res_domain,color="red")
-lines!(ax_nlsa_f,freq_domain,signal_domain,color="grey")
-lines!(ax_nlsa_f,freq_domain,trend_domain,color="blue")
-
-scatter!(ax_nlsa_f,freq_domain,res_domain,color="red",marker='x')
-scatter!(ax_nlsa_f,freq_domain,signal_domain,color="grey",marker='+')
-scatter!(ax_nlsa_f,freq_domain,trend_domain,color="blue",marker='o')
-
-
-Label(F[0, :], text = "comparison single mode and harmonics | $(meta[spot,"name"]) $(meta[spot,"IGBP_class"]) $(variable_list[vari]) $(method)", fontsize = 30)
-
-
-
-
-freqs = fftfreq(length(t), 1.0/Ts) |> fftshift
-freqstart = findall(x->x>=1/12,freqs)[1]
-freqend = findall(x->x>=6,freqs)[1]
-freq_domain = freqs[freqstart:freqend]
-
-Four = fft(signal) |> fftshift
-signal_domain = abs.(Four[freqstart:freqend]) .* 1000 .+ 10^-6
-Four = fft(trend) |> fftshift
-trend_domain = abs.(Four[freqstart:freqend]) .+ 10^-6
-Four = fft(signal .- trend) |> fftshift
-res_domain = abs.(Four[freqstart:freqend]) ./ 1000 .+ 10^-6
-
-ax_ssa = Axis(F[2,1:2],title="$le identified trend modes capture $val | $val_m lost by mixing of $le_m modes",
-yticksvisible = false,yticklabelsvisible = false,xlabel="t (d)",ylabel="GPP")
-ax_ssa_f = Axis(F[2,3],title="FFT spec",yscale=log10,
-yticksvisible = false,yticklabelsvisible = false,xlabel="f (/a)",ylabel="log rel power")
-
-lines!(ax_ssa,1:N,signal .- trend .- 4,color="red")
-lines!(ax_ssa,1:N,signal,color="grey")
-
-lines!(ax_ssa,1:N,trend,color="blue")
-
-
-lines!(ax_ssa_f,freq_domain,res_domain,color="red")
-lines!(ax_ssa_f,freq_domain,signal_domain,color="grey")
-lines!(ax_ssa_f,freq_domain,trend_domain,color="blue")
-
-scatter!(ax_ssa_f,freq_domain,res_domain,color="red",marker='x')
-scatter!(ax_ssa_f,freq_domain,signal_domain,color="grey",marker='+')
-scatter!(ax_ssa_f,freq_domain,trend_domain,color="blue",marker='o')
-
-save(savedir*"$(spot)_$(vari)_$(method).png",F)
-#save(dir*"test.png",F)
 
 end

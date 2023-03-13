@@ -105,3 +105,16 @@
 
 ## 03/07    2h
     refined figures from 03/04 and 03/05
+
+## 03/08    3h
+    finished poster thoughts
+    run on the year seasons
+
+
+## 03/13    8h
+    put togetehr figures for
+        reconstruction + FFT
+        EOF shapes + FFT
+        seasonality + FFT (not with fundamental yet)
+        change of seasonal behavior
+    found out the additional variables

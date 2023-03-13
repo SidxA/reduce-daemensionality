@@ -17,7 +17,7 @@ function single_robustness(outdir,method,W,vari,preproc,kappa,spot,yearsamples)
     return RC_l,lambda_l,protofreq_l
 end
 
-spot = 3
+spot = 1
 outdir="/net/scratch/lschulz/fluxfullset/"
 meta = load("/net/scratch/lschulz/fluxnetfullset/fullset_15a_gpp_nee_reco_ts.jld2")["meta"]
 W = 2556
@@ -127,7 +127,7 @@ outdir="/net/scratch/lschulz/fluxfullset/"
 W = 2556
 freqstart = Int(round(W/2,digits=0))+1
 tw = t0:Ts:(t0+(W-1)*Ts)
-spot=3
+spot=1
 
 years = (1:W) ./ 365
 
@@ -228,24 +228,47 @@ signal = file["signal"]
 
 color_ssa = "darkgreen"
 color_nlsa = "purple"
-lw = 2
+col_signal = "grey50"
+lw = 3
 ms = 5
 
-years = ((1:5478) ./ 365) .+ 1985
+years = ((1:5478) ./ 365) .+ 2005
 
 F = Figure(resolution=(800,300))
 
-ax = Axis(F[1,1],xticks=1985:3:2000,
+ax = Axis(F[1,1],xticks=2005:3:2020,
 xminorticksvisible = true,
 xminorgridvisible = true,
 xminorticks = IntervalsBetween(3),)
 
-scatter!(ax,years,signal,color="black",markersize = ms,marker=:x)
-lines!(ax,years,signal,color="black",markersize = 1)
-lines!(ax,years,rc_ssa,color=color_ssa,linewidth=lw)
-lines!(ax,years,rc_nlsa,color=color_nlsa,linewidth=lw)
+scatter!(ax,years,signal,color=col_signal,markersize = ms,marker=:x)
+lines!(ax,years,signal,color=col_signal,markersize = 1,label = "signal")
+lines!(ax,years,rc_ssa,color=color_ssa,linewidth=lw,label="SSA")
+lines!(ax,years,rc_nlsa,color=color_nlsa,linewidth=lw,label="NLSA")
 
 hideydecorations!(ax)
 hidespines!(ax,:t,:r)
 
+#axislegend(ax)
 save(dir*"reconstructions.png",F)
+
+"""
+just signal
+"""
+
+
+F = Figure(resolution=(800,200))
+
+ax = Axis(F[1,1],xticks=2005:3:2020,
+xminorticksvisible = true,
+xminorgridvisible = true,
+xminorticks = IntervalsBetween(3),)
+
+lines!(ax,years,signal,color=:black,markersize = 1,label = "signal")
+
+
+hideydecorations!(ax)
+hidespines!(ax,:t,:r)
+
+#axislegend(ax)
+save(dir*"signal.png",F)
