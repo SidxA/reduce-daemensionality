@@ -1,11 +1,18 @@
+"""
+GKSwstype=nul /opt/julia-1.8.5/bin/julia --threads 24 iterate_blockdata.jl 
+"""
+#include("/net/home/lschulz/scripts/toolbox.jl")
+#include("/net/home/lschulz/scripts/struct_blockdata.jl")
+#include("/net/home/lschulz/scripts/lSSA_deseasonalization.jl")
 
-include("/net/home/lschulz/scripts/toolbox.jl")
-include("/net/home/lschulz/scripts/struct_blockdata.jl")
-include("/net/home/lschulz/scripts/lSSA_deseasonalization.jl")
+include("/net/home/lschulz/reduce-daemensionality/toolbox.jl")
+include("/net/home/lschulz/reduce-daemensionality/struct_blockdata.jl")
+include("/net/home/lschulz/reduce-daemensionality/old/lSSA_deseasonalization.jl")
 
 #big parameters
 #N = 11322
 #W = Int(floor((365.25*11)))
+N = 5844
 k = 48
 """
 running raw at the moment
@@ -15,17 +22,18 @@ running raw at the moment
 #overlap=10
 
 #fluxnetfullset
-wholedata = SharedArray{Float32}(load("/net/scratch/lschulz/fluxnetfullset/fullset_15a_gpp_nee_reco_ts_ta_vpd.jld2")["wholedata"])
+savedirname = "/net/scratch/lschulz/fluxdata_march23/"*"fluxdata_raw.jld2"
+wholedata = SharedArray{Float32}(load(savedirname)["data"])
+#wholedata = SharedArray{Float32}(load("/net/scratch/lschulz/fluxnetfullset/fullset_15a_gpp_nee_reco_ts_ta_vpd.jld2")["wholedata"])
 #LAIF
 #wholedata = SharedArray{Float32}(Matrix(load("/net/scratch/lschulz/LAIF/data.jld2")["data"]'))
-N,spots,nvars = size(wholedata)
-vars=1
+N,spots,vars = size(wholedata)
 
 """
 OUTDIR NEEDS TO HAVE /
 """
 
-outdir = "/net/scratch/lschulz/fluxfullset_1a/"
+outdir = "/net/scratch/lschulz/fluxfullset_march23/"
 #outdir="/net/scratch/lschulz/LAIF/"
 
 #spots=71
@@ -121,7 +129,7 @@ end
 #Walist = [15,16,17]
 
 Threads.@threads for p=packaging(outdir)
-    for W = 365#Int.(floor.(Walist .* 24))
+    for W = Int.(floor.(365.25 .* [2,3,4,5,6,7,8]))
         d = matrixholder(N,W,k)
         doitall(d,wholedata,p)
     end

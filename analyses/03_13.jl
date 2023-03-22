@@ -963,7 +963,7 @@ for file in filelist
     period = parse(Int,years[2])-parse(Int,years[1])
     met = filenamesplit[4]
     res = filenamesplit[5]
-    if met == "FULLSET" && res == "DD" && period >= 20
+    if met == "FULLSET" && res == "DD" && period >= 15
         println(file)
         L = push!(L,String(file))
     end
@@ -1103,9 +1103,8 @@ end
 
 
 #choose variables
-variables = ["GPP_DT_VUT_USTAR50","NEE_VUT_USTAR50_DAY","RECO_NT_VUT_USTAR50",
-                "TA_F_DAY","SW_IN_F","LW_IN_F","VPD_F","LE_F_MDS","H_F_MDS",
-                "SWC_F_MDS_1","TS_F_MDS_1"]
+#"NEE_VUT_USTAR50_DAY","RECO_NT_VUT_USTAR50",,"VPD_F","LE_F_MDS","H_F_MDS",]
+variables = ["GPP_DT_VUT_USTAR50","TA_F_DAY","SW_IN_F","LW_IN_F","SWC_F_MDS_1","TS_F_MDS_1"]
 
 L = String[]
 for file in filelist
@@ -1154,3 +1153,53 @@ IT-Lav
 # these should have it!
 
 #now lets make a spots x variables Float32 table and its good to go
+
+spotslist = [
+"BE-Lon",
+"BE-Vie",
+"CH-Lae",
+"CH-Oe2",
+"DE-Geb",
+"DE-Hai",
+"DE-Tha",
+"DK-Sor",
+"FI-Hyy",
+"FR-Aur",
+"IT-BCi",
+"IT-Lav"
+]
+
+#create large spots x variables tensor
+#iterate them, fill them
+
+datadir = "/net/data/Fluxnet/FLUXNET2020-ICOS-WarmWinter/"
+
+function choose_incomplete(spot)
+    filename_incomplete = "FLX_"*spot*"_FLUXNET2015_FULLSET_DD"
+    return findall(x->x[1:33]=="FLX_"*spot*"_FLUXNET2015_FULLSET_DD",filelist)
+end
+
+n_spots = length(spotslist)
+n_variables = length(variables)
+N = Int(floor(365.25 * 16))
+
+large_data_matrix = zeros(Float32,N,n_spots,n_variables)
+
+
+for (i,spot) in enumerate(spotslist)
+    listnumber = choose_incomplete(spot)[1]
+    filename = filelist[listnumber]
+    df = CSV.read(datadir*filename,DataFrame)
+    starting = findall(x->x==20050101, df[!,"TIMESTAMP"])[1]
+    ending = findall(x->x==20201231, df[!,"TIMESTAMP"])[1]
+    for (j,variable) in enumerate(variables)
+        large_data_matrix[:,i,j] = Float32.(df[starting:ending,variable])
+        println(spot,"\t",variable)
+    end
+end
+    
+
+savedir="/net/scratch/lschulz/fluxdata_march23/"
+savedirname = savedir*"fluxdata_raw.jld2"
+jldsave(svedirname,
+data=large_data_matrix,spots=spotslist,variables=variables)

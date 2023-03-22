@@ -118,3 +118,18 @@
         seasonality + FFT (not with fundamental yet)
         change of seasonal behavior
     found out the additional variables
+
+## 03/14    8h
+    experimented with the projection possibility on dummy RC
+    in order to increase FFT resolution of W=1a EOF
+    didnt work out, can only do projection by duplicating them
+    didnt check spectra yet
+
+## 03/19    1h
+    prepared Float32 data tensor for computation of the SSA and NLSA
+    of the additional variables
+
+## 03/22    2h
+    ran all the variables
+    started to work on automatized display functions
+    no: think what we really need
